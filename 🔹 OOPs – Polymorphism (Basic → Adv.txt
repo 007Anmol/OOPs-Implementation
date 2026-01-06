@@ -1,0 +1,359 @@
+🔹 OOPs – Polymorphism (Basic → Advanced)
+
+With C++ Implementations
+
+1️⃣ What is Polymorphism? (Beginner Level)
+📌 Definition
+
+Polymorphism means:
+
+One interface, many forms
+
+In simple terms:
+
+Same function name
+
+Different behavior
+
+Depends on context
+
+💡 Real-Life Example
+
+🗣️ Word “run”
+
+Run a program
+
+Run a race
+
+Run a company
+
+Same word → different meaning → polymorphism
+
+2️⃣ Why Polymorphism is Needed?
+Benefit	Explanation
+Flexibility	Same code works for different objects
+Extensibility	Add new types without modifying existing code
+Clean Design	Eliminates large if-else chains
+Reusability	Common interfaces
+3️⃣ Types of Polymorphism in C++
+
+C++ supports two major types:
+
+Type	When it happens
+Compile-time	During compilation
+Run-time	During execution
+🔹 PART 1: Compile-Time Polymorphism
+
+Achieved using:
+
+Function Overloading
+
+Operator Overloading
+
+Templates (Parametric polymorphism)
+
+4️⃣ Function Overloading
+📌 Same function name, different parameters
+#include <iostream>
+using namespace std;
+
+class Math {
+public:
+    int add(int a, int b) {
+        return a + b;
+    }
+
+    double add(double a, double b) {
+        return a + b;
+    }
+
+    int add(int a, int b, int c) {
+        return a + b + c;
+    }
+};
+
+int main() {
+    Math m;
+    cout << m.add(2, 3) << endl;
+    cout << m.add(2.5, 3.5) << endl;
+    cout << m.add(1, 2, 3) << endl;
+}
+
+🔍 Key Points
+
+Decision made at compile time
+
+Return type alone cannot differentiate overloads ❌
+
+5️⃣ Operator Overloading
+📌 Making operators work for user-defined types
+class Point {
+public:
+    int x, y;
+
+    Point(int x, int y) : x(x), y(y) {}
+
+    Point operator + (const Point& p) {
+        return Point(x + p.x, y + p.y);
+    }
+};
+
+int main() {
+    Point p1(2, 3), p2(4, 5);
+    Point p3 = p1 + p2;
+    cout << p3.x << " " << p3.y;
+}
+
+🔥 Interview Insight
+
+Operator overloading improves readability
+
+Should behave intuitively
+
+6️⃣ Templates – Parametric Polymorphism
+template <typename T>
+T maximum(T a, T b) {
+    return (a > b) ? a : b;
+}
+
+int main() {
+    cout << maximum(3, 7) << endl;
+    cout << maximum(3.5, 2.1) << endl;
+}
+
+🔑 Why This is Polymorphism?
+
+Same logic → works for multiple data types
+
+🔹 PART 2: Run-Time Polymorphism (MOST IMPORTANT)
+
+Achieved using:
+
+Inheritance
+
+Virtual functions
+
+Base class pointer → Derived object
+
+7️⃣ Runtime Polymorphism – Core Idea
+
+Function call is resolved at runtime based on object type, not pointer type
+
+8️⃣ Basic Runtime Polymorphism Example
+#include <iostream>
+using namespace std;
+
+class Animal {
+public:
+    virtual void speak() {
+        cout << "Animal makes a sound" << endl;
+    }
+};
+
+class Dog : public Animal {
+public:
+    void speak() override {
+        cout << "Dog barks" << endl;
+    }
+};
+
+class Cat : public Animal {
+public:
+    void speak() override {
+        cout << "Cat meows" << endl;
+    }
+};
+
+int main() {
+    Animal* a;
+
+    Dog d;
+    Cat c;
+
+    a = &d;
+    a->speak();  // Dog barks
+
+    a = &c;
+    a->speak();  // Cat meows
+}
+
+🔍 What Happened?
+
+Pointer type: Animal*
+
+Object type: Dog / Cat
+
+Output depends on object, not pointer
+
+9️⃣ Without virtual – Very Common Trap ❌
+class Animal {
+public:
+    void speak() {
+        cout << "Animal sound";
+    }
+};
+
+Animal* a = new Dog();
+a->speak();   // Animal sound ❌
+
+
+❌ No polymorphism without virtual.
+
+🔟 How Runtime Polymorphism Works Internally (V-Table)
+🧠 Behind the Scenes
+
+Compiler creates Virtual Table (vtable)
+
+Each object stores a vptr
+
+At runtime, correct function is picked
+
+Animal*
+   |
+   ---> vptr ----> Dog::speak()
+
+1️⃣1️⃣ override Keyword (Best Practice)
+void speak() override;
+
+Why Use It?
+
+Compiler error if signature mismatch
+
+Prevents silent bugs
+
+1️⃣2️⃣ Base Pointer, Derived Object Rule
+
+✅ Allowed:
+
+Base* b = new Derived();
+
+
+❌ Not allowed:
+
+Derived* d = new Base();
+
+
+Why?
+
+Derived expects more features
+
+1️⃣3️⃣ Virtual Destructor (ADVANCED & CRITICAL)
+class Base {
+public:
+    virtual ~Base() {
+        cout << "Base Destructor\n";
+    }
+};
+
+class Derived : public Base {
+public:
+    ~Derived() {
+        cout << "Derived Destructor\n";
+    }
+};
+
+Base* b = new Derived();
+delete b;
+
+Output:
+Derived Destructor
+Base Destructor
+
+
+Without virtual destructor → memory leak
+
+1️⃣4️⃣ Pure Virtual Functions & Polymorphism
+class Shape {
+public:
+    virtual double area() = 0;
+};
+
+class Rectangle : public Shape {
+public:
+    double area() {
+        return 10 * 5;
+    }
+};
+
+
+🔹 This is runtime polymorphism + abstraction
+
+1️⃣5️⃣ Polymorphism vs Overloading (Interview Favorite)
+Overloading	Overriding
+Compile time	Runtime
+Same class	Base + Derived
+Different parameters	Same signature
+No virtual	Needs virtual
+1️⃣6️⃣ Polymorphism Replacing if-else (Real-World)
+
+❌ Bad Design:
+
+if(type == "UPI") payUPI();
+else if(type == "CARD") payCard();
+
+
+✅ Polymorphism:
+
+class Payment {
+public:
+    virtual void pay() = 0;
+};
+
+class UPI : public Payment {
+public:
+    void pay() { cout << "UPI payment"; }
+};
+
+Payment* p = new UPI();
+p->pay();
+
+1️⃣7️⃣ When NOT to Use Polymorphism
+
+❌ Small utility functions
+❌ Performance-critical inner loops
+❌ No behavior variation
+
+Overuse = complexity
+
+🔥 Common Interview Questions
+❓ Is polymorphism possible without inheritance?
+
+✅ Compile-time polymorphism → Yes
+❌ Runtime polymorphism → No
+
+❓ Can constructors be virtual?
+
+❌ No
+
+❓ Can static functions be virtual?
+
+❌ No (belongs to class, not object)
+
+❓ What happens if base function is not virtual?
+
+❌ Compile-time binding
+
+🚨 Common Mistakes
+
+❌ Forgetting virtual
+❌ Not using override
+❌ Missing virtual destructor
+❌ Calling derived methods via value (object slicing)
+
+🎯 Final Takeaway
+
+Polymorphism allows systems to grow without changing existing code.
+
+Compile-time → flexibility
+
+Runtime → extensibility
+
+Core of:
+
+Clean Architecture
+
+Frameworks
+
+Plugins
+
+APIs
